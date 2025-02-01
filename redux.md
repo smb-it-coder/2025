@@ -241,3 +241,238 @@ store.dispatch(fetchData());
 | **Redux Middleware** | Extends Redux capabilities by handling async operations, logging, and side effects. |
 
 Would you like an example of how to integrate Redux into a React project? 🚀
+
+### **What is the purpose of `combineReducers` in Redux?**  
+`combineReducers` is a helper function in Redux that **combines multiple reducers into a single root reducer**. It allows different slices of the state to be managed by different reducer functions.
+
+#### **Example: Using `combineReducers`**  
+```javascript
+import { combineReducers, createStore } from "redux";
+import userReducer from "./userReducer";
+import postsReducer from "./postsReducer";
+
+const rootReducer = combineReducers({
+  user: userReducer,
+  posts: postsReducer
+});
+
+const store = createStore(rootReducer);
+```
+Now, the state is structured as:  
+```javascript
+{
+  user: { ... },
+  posts: { ... }
+}
+```
+✅ **Why use `combineReducers`?**  
+- Keeps reducers modular and manageable.  
+- Helps maintainability in large applications.  
+- Allows separation of concerns by handling different parts of the state.  
+
+---
+
+### **What is the difference between `useSelector` and `useDispatch` in Redux?**  
+
+| Hook | **Purpose** | **Example Usage** |
+|-------|------------|------------------|
+| **`useSelector`** | Access **state** from the Redux store | `const user = useSelector(state => state.user);` |
+| **`useDispatch`** | Dispatch **actions** to update the Redux store | `const dispatch = useDispatch(); dispatch(addUser(newUser));` |
+
+#### **Example: Using both in a React Component**  
+```javascript
+import { useSelector, useDispatch } from "react-redux";
+import { increment } from "./counterSlice";
+
+const Counter = () => {
+  const count = useSelector(state => state.counter.value);
+  const dispatch = useDispatch();
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => dispatch(increment())}>Increment</button>
+    </div>
+  );
+};
+```
+
+---
+
+### **What is the significance of the `connect` function in Redux?**  
+The `connect` function is a **Higher-Order Component (HOC)** that connects React components to the Redux store in class-based components.
+
+#### **Example: Using `connect` in a Class Component**  
+```javascript
+import { connect } from "react-redux";
+
+const Counter = ({ count, increment }) => (
+  <div>
+    <p>Count: {count}</p>
+    <button onClick={increment}>Increment</button>
+  </div>
+);
+
+const mapStateToProps = state => ({
+  count: state.counter.value
+});
+
+const mapDispatchToProps = dispatch => ({
+  increment: () => dispatch({ type: "INCREMENT" })
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Counter);
+```
+✅ **Why use `connect`?**  
+- Used in **class components** before React Hooks (`useSelector`, `useDispatch`).  
+- Makes Redux state available to props in components.  
+
+---
+
+### **What are Synchronous and Asynchronous Actions in Redux?**  
+
+| Type | **Description** | **Example** |
+|------|---------------|------------|
+| **Synchronous Actions** | Dispatch an action and update state immediately. | `dispatch({ type: "INCREMENT" })` |
+| **Asynchronous Actions** | Handle delays like API calls before dispatching actions. | `dispatch(fetchUsers())` (via `redux-thunk`) |
+
+#### **Example: Synchronous Action**  
+```javascript
+const incrementAction = { type: "INCREMENT" };
+store.dispatch(incrementAction);
+```
+
+#### **Example: Asynchronous Action (Using Redux Thunk)**  
+```javascript
+const fetchUsers = () => {
+  return (dispatch) => {
+    fetch("https://api.example.com/users")
+      .then(response => response.json())
+      .then(data => dispatch({ type: "FETCH_USERS_SUCCESS", payload: data }));
+  };
+};
+```
+
+---
+
+### **How do you handle API calls in Redux?**  
+Handling API calls requires **middleware like `redux-thunk`**.
+
+#### **Example: Fetching Data using Redux Thunk**
+1️⃣ **Action Creator with Async API Call**  
+```javascript
+export const fetchUsers = () => async (dispatch) => {
+  dispatch({ type: "FETCH_USERS_REQUEST" });
+
+  try {
+    const response = await fetch("https://api.example.com/users");
+    const data = await response.json();
+    dispatch({ type: "FETCH_USERS_SUCCESS", payload: data });
+  } catch (error) {
+    dispatch({ type: "FETCH_USERS_FAILURE", error });
+  }
+};
+```
+2️⃣ **Reducer to Handle API Response**  
+```javascript
+const userReducer = (state = { users: [], loading: false }, action) => {
+  switch (action.type) {
+    case "FETCH_USERS_REQUEST":
+      return { ...state, loading: true };
+    case "FETCH_USERS_SUCCESS":
+      return { ...state, users: action.payload, loading: false };
+    case "FETCH_USERS_FAILURE":
+      return { ...state, loading: false, error: action.error };
+    default:
+      return state;
+  }
+};
+```
+✅ **Why use middleware?**  
+- Handles async operations without blocking UI.  
+- Ensures API errors don’t break the app.  
+
+---
+
+### **What are Redux middlewares like `redux-thunk` and `redux-saga`?**  
+
+| Middleware | **Usage** |
+|------------|----------|
+| **`redux-thunk`** | Handles async actions using functions inside actions (`dispatch(action)`). |
+| **`redux-saga`** | Uses **generators (`function*`)** to handle side effects in a more controlled way. |
+
+#### **Example: Redux Saga**
+```javascript
+import { takeEvery, put, call } from "redux-saga/effects";
+
+function* fetchUsers() {
+  const data = yield call(() => fetch("https://api.example.com/users").then(res => res.json()));
+  yield put({ type: "FETCH_USERS_SUCCESS", payload: data });
+}
+
+export function* watchFetchUsers() {
+  yield takeEvery("FETCH_USERS_REQUEST", fetchUsers);
+}
+```
+
+---
+
+### **What are the benefits of using Redux Toolkit (`RTK`) over traditional Redux?**  
+✅ **Redux Toolkit Advantages**  
+1. **Less Boilerplate** – Auto-generates action creators and reducers.  
+2. **Immutability Handling** – Uses `Immer.js` internally.  
+3. **Built-in Thunk Support** – No need to configure separately.  
+4. **Performance Optimizations** – Faster state updates.  
+
+---
+
+### **What is the role of `createSlice` in Redux Toolkit?**  
+`createSlice` simplifies Redux by **combining actions and reducers in one function**.
+
+#### **Example: Using `createSlice`**  
+```javascript
+import { createSlice } from "@reduxjs/toolkit";
+
+const counterSlice = createSlice({
+  name: "counter",
+  initialState: { value: 0 },
+  reducers: {
+    increment: (state) => { state.value += 1; },
+    decrement: (state) => { state.value -= 1; }
+  }
+});
+
+export const { increment, decrement } = counterSlice.actions;
+export default counterSlice.reducer;
+```
+
+---
+
+### **How does Redux handle immutability?**  
+1. **Reducers return new state objects** instead of modifying the existing state.  
+2. **Spread operator (`...`)** is used to create new objects/arrays.  
+3. **Redux Toolkit uses Immer.js**, allowing mutable syntax that produces immutable updates.  
+
+---
+
+### **Explain Redux DevTools and its benefits.**  
+Redux DevTools is a browser extension that helps **monitor state changes**.
+
+✅ **Key Benefits:**  
+- **Time-travel debugging** – Replay state changes.  
+- **State inspection** – View previous and next states.  
+- **Performance monitoring** – Detect unnecessary re-renders.  
+- **Action tracking** – View dispatched actions.
+
+#### **Setup Redux DevTools**
+```javascript
+import { configureStore } from "@reduxjs/toolkit";
+
+const store = configureStore({
+  reducer: rootReducer,
+  devTools: process.env.NODE_ENV !== "production"
+});
+```
+
+---
+🚀 **Would you like a full project setup using Redux Toolkit?**
