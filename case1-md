@@ -1,0 +1,45 @@
+/*
+Intervue provides a basic Sql sandbox with the following schema.
+
+candidate                             task
++---------------+---------+           +---------------+---------+
+| id            | int     |<----+  +->| id            | int     |
+| first_name    | varchar |     |  |  | title         | varchar |
+| last_name     | varchar |     |  |  | complexity    | varchar |
+| current_org   | varchar |     |  |  +---------------+---------+
+| language_id   | int     |--+  |  |
++---------------+---------+  |  |  |
+                             |  |  |
+   language                  |  |  |  candidate_tasks
++---------------+---------+  |  |  |  +---------------+----------------+
+| id            | int     |<-+  |  +--| task_id       | int            |
+| name          | varchar |     +-----| candidate_id  | int            |
++---------------+---------+           | start_time    | timestamptz    |
+                                      | end_time      | timestamptz    |
+                                      +---------------+----------------+
+*/
+
+
+SELECT * FROM candidate;
+//. SPEND TIME  TO COMPLET TASK --> AVG
+// GROUP BY - TASK.COMPLEXCITY -- 'LOW', MEDIUM, HIGH 
+
+SELECT AVG(TT.startTime - TT.endTime) , TT.complexity from ( 
+   SELECT CT.start_time as startTime, CT.end_time as endTime , T.complexity as complexity FROM candidate AS C 
+     INNER JOIN candidate_tasks AS CT 
+          ON CT.candidate_id == C.id
+     INNER JOIN TASK AS T 
+           ON CT.task_id == T.id
+     LEFT JOIN language LL
+         ON LL.id == C.language_id
+    GROUP BY T.complexity
+    ORDER By DESC T.complexity
+
+
+
+) as TT
+-- // I can't here you! are you there??????????????????
+GROUP By complexity
+
+Yes I ma here
+
