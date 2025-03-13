@@ -1,13 +1,4 @@
-For JavaScript Theorytical questions: "https://github.com/sudheerj/javascript-interview-questions"
-For Reactjs theory questions: https://github.com/sudheerj/reactjs-interview-questions/tree/master/.github/workflows
-For Google, Facebook, Microsoft coding challenges: https://youtube.com/c/KevinNaughtonJr
-Jest: https://github.com/sapegin/jest-cheat-sheet
-https://plainenglish.io/blog/50-javascript-output-questions
-https://github.com/priya42bagde/javascript-interview-questions?organization=priya42bagde&organization=priya42bagde#what-is-json-and-its-common-operations ---> IMP
 
-https://learnersbucket.com/javascript-sde-cheat-sheet/
-https://javascript.info/
-https://frontenddeveloperinterview.netlify.app/
 
 ================================================================================================================================================================================
 Code 1: Remove Duplicate characters from String
